@@ -104,12 +104,11 @@ class Zoomaker:
             return None
         return filename
 
-
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(description="Install models, git repos and run scripts defined in the zoo.yaml file")
     parser.add_argument("command", choices=["install", "run"], help="The command to execute.")
     parser.add_argument("script", nargs="?", help="The script name to execute.")
-    parser.add_argument("-v", "--version", action='version', help="The current version of the zoomaker.", version="0.1.0")
+    parser.add_argument("-v", "--version", action='version', help="The current version of the zoomaker.", version="0.1.1")
     args = parser.parse_args()
 
     zoomaker = Zoomaker("zoo.yaml")
@@ -117,3 +116,6 @@ if __name__ == "__main__":
         zoomaker.install()
     elif args.command == "run":
         zoomaker.run(args.script)
+
+if __name__ == "__main__":
+    main()
