@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "zoomaker"
+version = "0.1.0"
+description = ""
+authors = ["Benedikt Groß"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+huggingface-hub = "^0.14.0"
+GitPython = "^3.1.31"
+
+[tool.poetry.scripts]
+zoomaker = 'zoomaker:main'
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
