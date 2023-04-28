@@ -56,7 +56,7 @@ class Zoomaker:
                             print(f"\tgit pull: {repo.head.object.hexsha}")
                     # new repo
                     else:
-                        repo = git.Repo.clone_from(src, repo_path, no_checkout=True, allow_unsafe_protocols=True, allow_unsafe_options=True)
+                        repo = git.Repo.clone_from(src, repo_path, allow_unsafe_protocols=True, allow_unsafe_options=True)
                         if revision:
                             repo.git.checkout(revision)
                             print(f"\tgit checkout revision: {repo.head.object.hexsha}")
