@@ -10,12 +10,13 @@ Zoomaker is a command-line tool that helps install AI models, git repositories a
 
 ## 🛠 Installation
 
-`pip install zoomaker`
-
+```bash
+pip install zoomaker
+```
 
 ## 🦁 zoo.yaml Examples
 
-An examples for the `zoo.yaml` of a Stable Diffsion project with the [Automatic1111](https://github.com/AUTOMATIC1111/stable-diffusion-webui) image generator:
+Example of the `zoo.yaml` of a Stable Diffsion project with the [Automatic1111](https://github.com/AUTOMATIC1111/stable-diffusion-webui) image generator:
 
 ```yaml
 name: my-automatic1111-model-zoo
@@ -151,6 +152,9 @@ All commands are run from the root of the project, where also your `zoo.yaml` fi
 
 You might be asked for a [Hugging Face Access Token](https://huggingface.co/docs/hub/security-tokens) during `zoomaker install`. Some resources on Hugging Face require accepting the terms of use of the model. You can set your access token by running this command in a terminal. The command `huggingface-cli` is automatically shipped alongside zoomaker.
 
-```
+```bash
 huggingface-cli login
 ```
+
+## 🙏 Acknowledgements
+- Most of the internal heavy lifting is done be the [huggingface_hub library](https://huggingface.co/docs/huggingface_hub/guides/download) by Hugging Face. Thanks!
