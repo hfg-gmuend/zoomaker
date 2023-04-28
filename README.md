@@ -1,11 +1,35 @@
 # Work in progress. Please ignore.
 
-zoomaker
+Zoomaker
 ========
 
 Zoomaker is a command-line tool that helps install models, git repositories and run scripts. The information about the resources and scripts to be installed is specified in the `zoo.yaml` file.
 
-## zoo.yaml example
+## 🦁 zoo.yaml example
+
+```yaml
+name: my-automatic1111-model-zoo
+version: 1.0
+description: Lorem ipsum
+author: your name
+
+resources:
+  image_generator:
+    - name: automatic1111
+      src: https://github.com/AUTOMATIC1111/stable-diffusion-webui.git
+      type: git
+      revision: 22bcc7be428c94e9408f589966c2040187245d81
+      install_to: ./
+
+  models:
+    - name: v1-5-pruned-emaonly
+      src: runwayml/stable-diffusion-v1-5/v1-5-pruned-emaonly.safetensors
+      type: huggingface
+      install_to: ./stable-diffusion-webui/models/Stable-diffusion/
+```
+
+<details>
+<summary>`zoo.yaml` example long</summary>
 
 ```yaml
 name: my-automatic1111-model-zoo
@@ -65,36 +89,34 @@ resources:
 
 scripts:
   start: |
-    conda init bash
-    source ~/.bashrc
+    eval "$(conda shell.bash hook)"
     conda activate automatic1111
     cd /home/$(whoami)/stable-diffusion-webui/
-    ./webui.sh --no-half --listen
-
+    ./webui.sh --xformers --no-half
 ```
+</details>
 
-## Installation
+## 🛠 Installation
 
 ```
 pip install zoomaker
 ```
 
-## Usage
+## 🧞 Zoomaker Commands
+
+All commands are run from the root of the project, from a terminal:
+
+| Command                | Action                                           |
+| :--------------------- | :----------------------------------------------- |
+| `zoomaker install`          | Installs resources as defined in `zoo.yaml`                           |
+| `zoomaker run <script_name>`    | Run CLI scripts as defined in `zoo.yaml` |
+| `zoomaker --help` | Get help using the Zoomaker CLI                     |
+| `zoomaker --version` | Show current Zoomaker version                     |
+
+## 🤗 Hugging Face Access Token
+
+You might be asked for a [Hugging Face Access Token](https://huggingface.co/docs/hub/security-tokens) during `zoomaker install`. Some resources on Hugging Face require accepting the terms of use of the model. You can set your access token by running this command in a terminal:
 
 ```
-zoomaker <command> <script>
+huggingface-cli login
 ```
-
-where `<command>` is one of `install` or `run`, and `<script>` is the name of the script to execute.
-
-- To install the resources defined in the `zoo.yaml` file, run:
-
-  ```
-  zoomaker install
-  ```
-
-- To run a script defined in the `zoo.yaml` file, run:
-
-  ```
-  zoomaker run <script_name>
-  ```
