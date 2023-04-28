@@ -1,11 +1,17 @@
-# Work in progress. Please ignore.
-
-Zoomaker
+Zoomaker - Friendly house keeping for your AI model zoo and related resources.
 ========
 
-Zoomaker is a command-line tool that helps install models, git repositories and run scripts. The information about the resources and scripts to be installed is specified in the `zoo.yaml` file.
+Zoomaker is a command-line tool that helps install AI models, git repositories and run scripts.
 
-## 🦁 zoo.yaml example
+- single source of truth: all resources are neatly definied in the `zoo.yaml` file
+- freeze versions: know exactly which revision of a resources is installed at any time
+- only download once: optimize bandwidth and cache your models locally
+- optimize disk usage: downloaded models are symlinked to the installation folder (small files <5MB are duplicate)
+
+
+## 🦁 zoo.yaml examples
+
+An examples for the `zoo.yaml` of a Stable Diffsion project with the [Automatic1111](https://github.com/AUTOMATIC1111/stable-diffusion-webui) image generator:
 
 ```yaml
 name: my-automatic1111-model-zoo
@@ -22,8 +28,8 @@ resources:
       install_to: ./
 
   models:
-    - name: v1-5-pruned-emaonly
-      src: runwayml/stable-diffusion-v1-5/v1-5-pruned-emaonly.safetensors
+    - name: v2-1_768-ema-pruned
+      src: stabilityai/stable-diffusion-2-1/v2-1_768-ema-pruned.safetensors
       type: huggingface
       install_to: ./stable-diffusion-webui/models/Stable-diffusion/
 ```
@@ -57,11 +63,6 @@ resources:
       src: runwayml/stable-diffusion-v1-5/v1-5-pruned-emaonly.safetensors
       type: huggingface
       install_to: *models
-    - name: analog-diffusion-v1
-      src: https://civitai.com/api/download/models/1344
-      type: donwload
-      install_to: *models
-      rename_to: analog-diffusion-v1.safetensors
 
   controlnet:
     - name: control_sd15_canny
@@ -89,12 +90,36 @@ resources:
 
 scripts:
   start: |
-    eval "$(conda shell.bash hook)"
-    conda activate automatic1111
     cd /home/$(whoami)/stable-diffusion-webui/
-    ./webui.sh --xformers --no-half
+    ./webui.sh
 ```
 </details>
+
+## zoo.yaml structure
+
+Top level:
+- `name` (mandatory)
+- `version`, `description`, `author`, `aliases` (optional)
+- `resources` (mandatory) : `<group-name>` : [array of resources]
+- `scripts` (optional) : `<script-name>`
+
+Resource:
+- `name`, `src`, `type`, `install_to` (mandatory)
+- `rename_to` (optional)
+- `revision` (optional), if none is defined the latest version from the main branch is downloaded
+- `type` can either be `git`, `huggingface` or `download`
+
+```yaml
+models:
+  resources:
+    - name: analog-diffusion-v1
+      src: https://civitai.com/api/download/models/1344
+      type: download
+      install_to: *models
+      rename_to: analog-diffusion-v1.safetensors
+```
+Please note:
+The resource `type: download` can be seen as the last resort. Currently there is no caching or symlinking of web downloads.
 
 ## 🛠 Installation
 
@@ -104,7 +129,7 @@ pip install zoomaker
 
 ## 🧞 Zoomaker Commands
 
-All commands are run from the root of the project, from a terminal:
+All commands are run from the root of the project, where also your `zoo.yaml` file is located.
 
 | Command                | Action                                           |
 | :--------------------- | :----------------------------------------------- |
@@ -115,7 +140,7 @@ All commands are run from the root of the project, from a terminal:
 
 ## 🤗 Hugging Face Access Token
 
-You might be asked for a [Hugging Face Access Token](https://huggingface.co/docs/hub/security-tokens) during `zoomaker install`. Some resources on Hugging Face require accepting the terms of use of the model. You can set your access token by running this command in a terminal:
+You might be asked for a [Hugging Face Access Token](https://huggingface.co/docs/hub/security-tokens) during `zoomaker install`. Some resources on Hugging Face require accepting the terms of use of the model. You can set your access token by running this command in a terminal. The command `huggingface-cli` is automatically shipped alongside zoomaker.
 
 ```
 huggingface-cli login
