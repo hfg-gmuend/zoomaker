@@ -102,6 +102,7 @@ scripts:
 
 <details>
 <summary>`zoo.yaml` with web download</summary>
+
 ```yaml
 models:
   resources:
@@ -112,6 +113,7 @@ models:
       rename_to: analog-diffusion-v1.safetensors
 ```
 </details>
+
 Please note:
 The resource `type: download` can be seen as the last resort. Currently there is no caching or symlinking of web downloads. Recommended to avoid it.
 
