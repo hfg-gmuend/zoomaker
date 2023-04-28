@@ -1,11 +1,11 @@
 [tool.poetry]
 name = "zoomaker"
-version = "0.3.0"
-description = ""
+version = "0.3.1"
+description = "Zoomaker - Friendly house keeping for your AI model zoo and related resources."
 authors = ["Benedikt Groß"]
 readme = "README.md"
-
-[project.urls]
+homepage = "https://github.com/hfg-gmuend/zoomaker"
+documentation = "https://github.com/hfg-gmuend/zoomaker"
 repository = "https://github.com/hfg-gmuend/zoomaker"
 
 [tool.poetry.dependencies]
