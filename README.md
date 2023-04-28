@@ -10,9 +10,8 @@ Zoomaker is a command-line tool that helps install AI models, git repositories a
 
 ## 🛠 Installation
 
-```
-pip install zoomaker
-```
+`pip install zoomaker`
+
 
 ## 🦁 zoo.yaml Examples
 
@@ -117,20 +116,25 @@ models:
 Please note:
 The resource `type: download` can be seen as the last resort. Currently there is no caching or symlinking of web downloads. Recommended to avoid it.
 
-## zoo.yaml Structure
+## 🧮 zoo.yaml Structure
 
-Top level:
+<details>
+<summary>Top level:</summary>
+
 - `name` (mandatory)
 - `version`, `description`, `author`, `aliases` (optional)
-- `resources` (mandatory) : `<group-name>` : [array of resources]
+- `resources` (mandatory) : `<group-name>` : `[]` (array of resources)
 - `scripts` (optional) : `<script-name>`
+</details>
 
-Resource:
+<details>
+<summary>Resource:</summary>
+
 - `name`, `src`, `type`, `install_to` (mandatory)
 - `rename_to` (optional)
 - `revision` (optional), if none is defined the latest version from the main branch is downloaded
 - `type` can either be `git`, `huggingface` or `download`
-
+</details>
 
 ## 🧞 Zoomaker Commands
 
