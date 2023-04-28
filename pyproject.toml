@@ -1,9 +1,12 @@
 [tool.poetry]
 name = "zoomaker"
-version = "0.2.0"
+version = "0.3.0"
 description = ""
 authors = ["Benedikt Groß"]
 readme = "README.md"
+
+[project.urls]
+repository = "https://github.com/hfg-gmuend/zoomaker"
 
 [tool.poetry.dependencies]
 python = "^3.9"
