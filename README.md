@@ -3,13 +3,18 @@ Zoomaker - Friendly house keeping for your AI model zoo and related resources.
 
 Zoomaker is a command-line tool that helps install AI models, git repositories and run scripts.
 
-- single source of truth: all resources are neatly definied in the `zoo.yaml` file
-- freeze versions: know exactly which revision of a resources is installed at any time
-- only download once: optimize bandwidth and cache your models locally
-- optimize disk usage: downloaded models are symlinked to the installation folder (small files <5MB are duplicate)
+- **single source of truth**: all resources are neatly definied in the `zoo.yaml` file
+- **freeze versions**: know exactly which revision of a resources is installed at any time
+- **only download once**: optimize bandwidth and cache your models locally
+- **optimize disk usage**: downloaded models are symlinked to the installation folder (small files <5MB are duplicate)
 
+## 🛠 Installation
 
-## 🦁 zoo.yaml examples
+```
+pip install zoomaker
+```
+
+## 🦁 zoo.yaml Examples
 
 An examples for the `zoo.yaml` of a Stable Diffsion project with the [Automatic1111](https://github.com/AUTOMATIC1111/stable-diffusion-webui) image generator:
 
@@ -95,7 +100,22 @@ scripts:
 ```
 </details>
 
-## zoo.yaml structure
+<details>
+<summary>`zoo.yaml` with web download</summary>
+```yaml
+models:
+  resources:
+    - name: analog-diffusion-v1
+      src: https://civitai.com/api/download/models/1344
+      type: download
+      install_to: ./stable-diffusion-webui/models/Stable-diffusion/
+      rename_to: analog-diffusion-v1.safetensors
+```
+</details>
+Please note:
+The resource `type: download` can be seen as the last resort. Currently there is no caching or symlinking of web downloads. Recommended to avoid it.
+
+## zoo.yaml Structure
 
 Top level:
 - `name` (mandatory)
@@ -109,23 +129,6 @@ Resource:
 - `revision` (optional), if none is defined the latest version from the main branch is downloaded
 - `type` can either be `git`, `huggingface` or `download`
 
-```yaml
-models:
-  resources:
-    - name: analog-diffusion-v1
-      src: https://civitai.com/api/download/models/1344
-      type: download
-      install_to: *models
-      rename_to: analog-diffusion-v1.safetensors
-```
-Please note:
-The resource `type: download` can be seen as the last resort. Currently there is no caching or symlinking of web downloads.
-
-## 🛠 Installation
-
-```
-pip install zoomaker
-```
 
 ## 🧞 Zoomaker Commands
 
