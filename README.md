@@ -8,7 +8,13 @@ Zoomaker is a command-line tool that helps install AI models, git repositories a
 - **only download once**: optimize bandwidth and cache your models locally
 - **optimize disk usage**: downloaded models are symlinked to the installation folder (small files <5MB are duplicate)
 
-## 🛠 Installation
+Basically:
+1. Install Zoomaker `pip install zoomaker`
+2. Define your resources in the `zoo.yaml` file
+3. Run `zoomaker install` to install them
+
+
+## 📦 Installation
 
 ```bash
 pip install zoomaker
