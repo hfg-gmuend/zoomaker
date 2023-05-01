@@ -16,22 +16,22 @@ class Zoomaker:
 
     def _check_yaml(self):
         if "name" not in self.data:
-            raise Exception("👊 'name' is missing in zoo.yaml")
+            raise Exception("❌ 'name' is missing in zoo.yaml")
         if "resources" not in self.data:
-            raise Exception("👊 'resources' is missing in zoo.yaml")
+            raise Exception("❌ 'resources' is missing in zoo.yaml")
         for group, resources in self.data["resources"].items():
             for resource in resources:
                 if "name" not in resource:
-                    raise Exception("👊 Resource must have 'name' attribute")
+                    raise Exception("❌ Resource must have 'name' attribute")
                 if "src" not in resource:
-                    raise Exception("👊 Resource must have 'src' attribute")
+                    raise Exception("❌ Resource must have 'src' attribute")
                 if "type" not in resource:
-                    raise Exception("👊 Resource must have 'type' attribute")
+                    raise Exception("❌ Resource must have 'type' attribute")
                 if "install_to" not in resource:
-                    raise Exception("👊 Resource must have 'install_to' attribute")
+                    raise Exception("❌ Resource must have 'install_to' attribute")
                 type = resource["type"]
                 if type not in ["huggingface", "git", "download"]:
-                    raise Exception(f"👊 Unknown resource type: {type}")
+                    raise Exception(f"❌ Unknown resource type: {type}")
 
     def install(self):
         print(f"👋 -- {self.yaml_file} --")
