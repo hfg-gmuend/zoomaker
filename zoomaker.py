@@ -34,7 +34,7 @@ class Zoomaker:
                     raise Exception(f"❌ Unknown resource type: {type}")
 
     def install(self):
-        print(f"👋 -- {self.yaml_file} --")
+        print(f"👋 ===> {self.yaml_file} <===")
         print(f"name: {self.data.get('name', 'N/A')}")
         print(f"version: {self.data.get('version', 'N/A')}\n")
         print(f"👇 installing resources ...")
@@ -126,23 +126,18 @@ class Zoomaker:
         return filename
 
 def main():
-    parser = argparse.ArgumentParser(description="Install models, git repos and run scripts defined in the zoo.yaml file")
-    parser.add_argument("command", nargs="?", default="help", choices=["install", "run"], help="The command to execute.")
+    parser = argparse.ArgumentParser(description="Install models, git repos and run scripts defined in the zoo.yaml file.")
+    parser.add_argument("command", nargs="?", choices=["install", "run"], help="The command to execute.")
     parser.add_argument("script", nargs="?", help="The script name to execute.")
-    parser.add_argument("-v", "--version", action='version', help="The current version of the zoomaker.", version="0.3.1")
+    parser.add_argument("-v", "--version", action='version', help="The current version of the zoomaker.", version="0.4.0")
+    args = parser.parse_args()
 
-    # print help if no arguments are provided
-    try:
-        args = parser.parse_args()
-    except:
-        parser.print_help()
-        return
-
-    zoomaker = Zoomaker("zoo.yaml")
     if args.command == "install":
-        zoomaker.install()
+        Zoomaker("zoo.yaml").install()
     elif args.command == "run":
-        zoomaker.run(args.script)
+        Zoomaker("zoo.yaml").run(args.script)
+    else:
+        parser.print_help()
 
 if __name__ == "__main__":
     main()
