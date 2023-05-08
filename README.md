@@ -23,7 +23,7 @@ pip install zoomaker
 
 ## 🦁 zoo.yaml Examples
 
-Example of the `zoo.yaml` of a Stable Diffsion project with the [Automatic1111](https://github.com/AUTOMATIC1111/stable-diffusion-webui) image generator:
+Example of the `zoo.yaml` of a Stable Diffusion project with the [Automatic1111](https://github.com/AUTOMATIC1111/stable-diffusion-webui) image generator:
 
 ```yaml
 name: my-automatic1111-model-zoo
