@@ -159,9 +159,13 @@ All commands are run from the root of the project, where also your `zoo.yaml` fi
 | `zoomaker --no-symlinks` | Do not use symlinks for installing resources  |
 
 ## ⚠️ Limitations on Windows
-In order to have an efficient cache-system, Zoomaker relies on the [huggingface_hub library](https://huggingface.co/docs/huggingface_hub/guides/download) which uses symlinks. Unfortunately, symlinks are not widley supported on Windows. Therefore, you can disable the use of symlinks by adding a flag `--no-symlinks` to the install command: `zoomaker install --no-symlinks`. The cache directory will still be used to check wether the file is already cached or not. If already cached, the file is duplicated from the cache (i.e. saves bandwidth but increases disk usage). If the file is not already cached, it will be downloaded and moved directly to the install dir.
-If you still want to use symlinks on Windows, you can use either the [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10) (WSL) to run Zoomaker (don't forget to [enable developer mode](https://docs.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development)). Or run zoomaker as administrator.
+Symlinks are not widely supported on Windows, which limits the caching mechanism used by Zoomaker. To work around this limitation, you can disable symlinks by using the `--no-symlinks` flag with the install command:
 
+```bash
+zoomaker install --no-symlinks
+```
+
+This will still use the cache directory for checking if files are already cached, but if not, they will be downloaded and duplicated directly to the installation directory, saving bandwidth but increasing disk usage. Alternatively, you can use the [Windows Subsystem for Linux "WSL"](https://docs.microsoft.com/en-us/windows/wsl/install-win10) (don't forget to [enable developer mode](https://docs.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development)) or run Zoomaker as an administrator to enable symlink support on Windows.
 
 ## 🤗 Hugging Face Access Token
 
