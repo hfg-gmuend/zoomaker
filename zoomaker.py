@@ -33,10 +33,12 @@ class Zoomaker:
                 if type not in ["huggingface", "git", "download"]:
                     raise Exception(f"❌ Unknown resource type: {type}")
 
-    def install(self):
+    def install(self, no_symlinks: bool = False):
         print(f"👋 ===> {self.yaml_file} <===")
         print(f"name: {self.data.get('name', 'N/A')}")
         print(f"version: {self.data.get('version', 'N/A')}\n")
+        if no_symlinks:
+            print(f"👇 installing resources without symlinks ...")
         print(f"👇 installing resources ...")
         counter = 0;
         for group, resources in self.data["resources"].items():
@@ -57,7 +59,7 @@ class Zoomaker:
                 if type == "huggingface":
                     repo_id = "/".join(src.split("/")[0:2])
                     repo_filepath = "/".join(src.split("/")[2:])
-                    downloaded = hf_hub_download(repo_id=repo_id, filename=repo_filepath, local_dir=install_to, revision=revision)
+                    downloaded = hf_hub_download(repo_id=repo_id, filename=repo_filepath, local_dir=install_to, revision=revision, local_dir_use_symlinks=False if no_symlinks else "auto")
                     if rename_to:
                         os.rename(downloaded, os.path.join(install_to, rename_to))
                 # Git
@@ -129,11 +131,12 @@ def main():
     parser = argparse.ArgumentParser(description="Install models, git repos and run scripts defined in the zoo.yaml file.")
     parser.add_argument("command", nargs="?", choices=["install", "run"], help="The command to execute.")
     parser.add_argument("script", nargs="?", help="The script name to execute.")
+    parser.add_argument("-n", "--no-symlinks", action='store_true', help="Do not create symlinks for the installed resources.")
     parser.add_argument("-v", "--version", action='version', help="The current version of the zoomaker.", version="0.4.0")
     args = parser.parse_args()
 
     if args.command == "install":
-        Zoomaker("zoo.yaml").install()
+        Zoomaker("zoo.yaml").install(args.no_symlinks)
     elif args.command == "run":
         Zoomaker("zoo.yaml").run(args.script)
     else:
