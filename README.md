@@ -155,6 +155,11 @@ All commands are run from the root of the project, where also your `zoo.yaml` fi
 | `zoomaker --help` | Get help using the Zoomaker CLI                     |
 | `zoomaker --version` | Show current Zoomaker version                     |
 
+## Limitations on Windows
+In order to have an efficient cache-system, huggingface-hub uses symlinks. However, symlinks are not supported on all machines like on windows. Therefore, you can disable the cache-system by adding a flag `--no-symlinks` to the command: `zoomaker install --no-symlinks`. This means that every time you install a resource, it will be downloaded again. This is not a problem for small resources, but for large resources like models, this can take a while.
+If you still want to use the cache-system, you can use the [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10) (WSL) to run Zoomaker or you need to [enable developer mode](https://docs.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development) or run zoomaker as administrator. This will allow you to use symlinks and Zoomaker will run as expected.
+
+
 ## 🤗 Hugging Face Access Token
 
 You might be asked for a [Hugging Face Access Token](https://huggingface.co/docs/hub/security-tokens) during `zoomaker install`. Some resources on Hugging Face require accepting the terms of use of the model. You can set your access token by running this command in a terminal. The command `huggingface-cli` is automatically shipped alongside zoomaker.
