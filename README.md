@@ -1,3 +1,5 @@
+![zoomaker_social_keyvisual](https://github.com/hfg-gmuend/zoomaker/assets/480224/75d3d492-fe54-4711-afbf-02768bbb4033)
+
 Zoomaker - Friendly house keeping for your AI model zoo and related resources.
 ========
 
@@ -150,14 +152,15 @@ All commands are run from the root of the project, where also your `zoo.yaml` fi
 
 | Command                | Action                                           |
 | :--------------------- | :----------------------------------------------- |
-| `zoomaker install`          | Installs resources as defined in `zoo.yaml`                           |
+| `zoomaker install`          | Installs resources as defined in `zoo.yaml` |
 | `zoomaker run <script_name>`    | Run CLI scripts as defined in `zoo.yaml` |
 | `zoomaker --help` | Get help using the Zoomaker CLI                     |
 | `zoomaker --version` | Show current Zoomaker version                     |
+| `zoomaker --no-symlinks` | Do not use symlinks for installing resources  |
 
-## Limitations on Windows
-In order to have an efficient cache-system, huggingface-hub uses symlinks. However, symlinks are not supported on all machines like on windows. Therefore, you can disable the cache-system by adding a flag `--no-symlinks` to the command: `zoomaker install --no-symlinks`. This means that every time you install a resource, it will be downloaded again. This is not a problem for small resources, but for large resources like models, this can take a while.
-If you still want to use the cache-system, you can use the [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10) (WSL) to run Zoomaker or you need to [enable developer mode](https://docs.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development) or run zoomaker as administrator. This will allow you to use symlinks and Zoomaker will run as expected.
+## ⚠️ Limitations on Windows
+In order to have an efficient cache-system, Zoomaker relies on the [huggingface_hub library](https://huggingface.co/docs/huggingface_hub/guides/download) which uses symlinks. Unfortunately, symlinks are not widley supported on Windows. Therefore, you can disable the use of symlinks by adding a flag `--no-symlinks` to the install command: `zoomaker install --no-symlinks`. The cache directory will still be used to check wether the file is already cached or not. If already cached, the file is duplicated from the cache (i.e. saves bandwidth but increases disk usage). If the file is not already cached, it will be downloaded and moved directly to the install dir.
+If you still want to use symlinks on Windows, you can use either the [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10) (WSL) to run Zoomaker (don't forget to [enable developer mode](https://docs.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development)). Or run zoomaker as administrator.
 
 
 ## 🤗 Hugging Face Access Token
