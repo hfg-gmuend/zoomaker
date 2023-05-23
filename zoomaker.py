@@ -38,7 +38,7 @@ class Zoomaker:
         print(f"name: {self.data.get('name', 'N/A')}")
         print(f"version: {self.data.get('version', 'N/A')}\n")
         if no_symlinks:
-            print(f"👇 installing resources without symlinks ...")
+            print(f"⛔️ installing resources without symlinks ...")
         print(f"👇 installing resources ...")
         counter = 0;
         for group, resources in self.data["resources"].items():
@@ -131,7 +131,7 @@ def main():
     parser = argparse.ArgumentParser(description="Install models, git repos and run scripts defined in the zoo.yaml file.")
     parser.add_argument("command", nargs="?", choices=["install", "run"], help="The command to execute.")
     parser.add_argument("script", nargs="?", help="The script name to execute.")
-    parser.add_argument("-n", "--no-symlinks", action='store_true', help="Do not create symlinks for the installed resources.")
+    parser.add_argument("--no-symlinks", action='store_true', help="Do not create symlinks for the installed resources.")
     parser.add_argument("-v", "--version", action='version', help="The current version of the zoomaker.", version="0.4.0")
     args = parser.parse_args()
 
