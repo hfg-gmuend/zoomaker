@@ -15,6 +15,7 @@ Zoomaker is a command-line tool that helps install AI models, git repositories a
 1. Install Zoomaker `pip install zoomaker`
 2. Define your resources in the `zoo.yaml` file
 3. Run `zoomaker install` to install them
+(on Windows: `zoomaker install --no-symlinks`, see [hints](https://github.com/hfg-gmuend/zoomaker#%EF%B8%8F-limitations-on-windows) below)
 
 
 ## 📦 Installation
@@ -121,10 +122,9 @@ models:
       install_to: ./stable-diffusion-webui/models/Stable-diffusion/
       rename_to: analog-diffusion-v1.safetensors
 ```
-</details>
-
 Please note:
-The resource `type: download` can be seen as the last resort. Currently there is no caching or symlinking of web downloads. Recommended to avoid it.
+The resource `type: download` can be seen as the last resort. Currently there is no caching or symlinking of web downloads. Recommended to avoid it :)
+</details>
 
 ## 🧮 zoo.yaml Structure
 
@@ -177,3 +177,4 @@ huggingface-cli login
 
 ## 🙏 Acknowledgements
 - Most of the internal heavy lifting is done be the [huggingface_hub library](https://huggingface.co/docs/huggingface_hub/guides/download) by Hugging Face. Thanks!
+- "Zoomaker Safari Hacker Cat" cover image by Alia Tasler, based on this [OpenMoji](https://openmoji.org/library/emoji-1F431-200D-1F4BB/). Thanks!
