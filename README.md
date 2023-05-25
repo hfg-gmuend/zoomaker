@@ -5,7 +5,7 @@ Zoomaker - Friendly house keeping for your AI model zoo and related resources.
 
 Zoomaker is a command-line tool that helps install AI models, git repositories and run scripts.
 
-- **single source of truth**: all resources are neatly definied in the `zoo.yaml` file
+- **single source of truth**: all resources are neatly defined in the `zoo.yaml` file
 - **freeze versions**: know exactly which revision of a resources is installed at any time
 - **only download once**: optimize bandwidth and cache your models locally
 - **optimize disk usage**: downloaded models are symlinked to the installation folder (small files <5MB are duplicate)
