@@ -140,7 +140,7 @@ def main():
     parser.add_argument("command", nargs="?", choices=["install", "run"], help="The command to execute.")
     parser.add_argument("script", nargs="?", help="The script name to execute.")
     parser.add_argument("--no-symlinks", action='store_true', help="Do not create symlinks for the installed resources.")
-    parser.add_argument("-v", "--version", action='version', help="The current version of the zoomaker.", version="0.5.0")
+    parser.add_argument("-v", "--version", action='version', help="The current version of the zoomaker.", version="0.6.0")
     args = parser.parse_args()
 
     if args.command == "install":
