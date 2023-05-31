@@ -32,10 +32,10 @@ class ZoomakerTestCase(unittest.TestCase):
 
     def tearDownClass():
         sys.stdout = sys.__stdout__
-        delete_tmp()
 
     def tearDown(self):
         delete_zoo()
+        delete_tmp()
 
     def test_empty_zoo_yaml(self):
         create_zoo("")
@@ -88,6 +88,38 @@ class ZoomakerTestCase(unittest.TestCase):
         zoomaker.install()
         self.assertTrue(os.path.exists("./tmp/models/Stable-diffusion/analog-diffusion-1.0.safetensors"))
         self.assertTrue(os.path.exists("./tmp/embeddings/moebius.bin"))
+        # smybolik link
+        self.assertTrue(os.path.islink("./tmp/models/Stable-diffusion/analog-diffusion-1.0.safetensors"))
+        # no smybolik link, as smaller than 5MB
+        self.assertFalse(os.path.islink("./tmp/embeddings/moebius.bin"))
+
+    def test_install_no_symlinks(self):
+        create_zoo(
+            """
+            name: test
+            version: 0.0.1
+            resources:
+                models:
+                    - name: analog-diffusion-1.0
+                      src: wavymulder/Analog-Diffusion/analog-diffusion-1.0.safetensors
+                      type: huggingface
+                      install_to: ./tmp/models/Stable-diffusion/
+
+                embeddings:
+                    - name: moebius
+                      src: sd-concepts-library/moebius/learned_embeds.bin
+                      type: huggingface
+                      install_to: ./tmp/embeddings/
+                      rename_to: moebius.bin
+            """
+        )
+        zoomaker = Zoomaker("zoo.yaml")
+        no_symlinks = True
+        zoomaker.install(no_symlinks)
+        self.assertTrue(os.path.exists("./tmp/models/Stable-diffusion/analog-diffusion-1.0.safetensors"))
+        self.assertTrue(os.path.exists("./tmp/embeddings/moebius.bin"))
+        self.assertFalse(os.path.islink("./tmp/models/Stable-diffusion/analog-diffusion-1.0.safetensors"))
+        self.assertFalse(os.path.islink("./tmp/embeddings/moebius.bin"))
 
     def test_install_git(self):
         create_zoo(
