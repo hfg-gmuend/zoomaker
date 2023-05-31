@@ -61,7 +61,7 @@ class Zoomaker:
                     repo_filepath = "/".join(src.split("/")[2:])
                     downloaded = hf_hub_download(repo_id=repo_id, filename=repo_filepath, local_dir=install_to, revision=revision, local_dir_use_symlinks=False if no_symlinks else "auto")
                     if rename_to:
-                        os.rename(downloaded, os.path.join(install_to, rename_to))
+                        self._rename_file(downloaded, os.path.join(install_to, rename_to))
                 # Git
                 elif type == "git":
                     repo_path = os.path.join(install_to, self._get_repo_name(src))
@@ -89,7 +89,7 @@ class Zoomaker:
                 else:
                     downloaded = self._download_file(src, os.path.join(install_to, os.path.basename(src)))
                     if rename_to:
-                        os.rename(downloaded, os.path.join(install_to, rename_to))
+                        self._rename_file(downloaded, os.path.join(install_to, rename_to))
                     if revision:
                         print(f"\trevision is not supported for download. Ignoring revision: {revision}")
 
@@ -111,6 +111,14 @@ class Zoomaker:
             return os.path.basename(src).replace(".git", "")
         else:
             return os.path.basename(src)
+
+    def _rename_file(self, src, dest):
+        # remove dest if exists due to os.rename limitation in Windows
+        if os.path.exists(dest):
+            os.remove(dest)
+            os.rename(src, dest)
+        else:
+            os.rename(src, dest)
 
     def _download_file(self, url, filename):
         response = requests.get(url, stream=True)
