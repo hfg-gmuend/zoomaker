@@ -102,11 +102,26 @@ resources:
       src: https://github.com/Bing-su/sd-webui-tunnels.git
       type: git
       install_to: *extensions
+```
+</details>
 
+<details>
+<summary>`zoo.yaml` with script snippets</summary>
+
+Here are a few examples of how to run scripts snippets from the `zoo.yaml` file. For example for starting the Automatic1111's webui, you could setup snippets like these and then run them with `zoomaker run start_webui`. All scripts are run from the root of the project, please adjust the paths accordingly.
+
+```yaml
 scripts:
-  start: |
+  start_webui: |
+    cd .\stable-diffusion-webui && call webui.bat
+```
+
+```yaml
+scripts:
+  start_webui: |
+    conda activate automatic1111
     cd /home/$(whoami)/stable-diffusion-webui/
-    ./webui.sh
+    ./webui.sh --theme dark --xformers --no-half
 ```
 </details>
 
