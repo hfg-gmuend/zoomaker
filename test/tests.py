@@ -55,20 +55,17 @@ class ZoomakerTestCase(unittest.TestCase):
         create_zoo(
             """
             name: test
-            version: 0.0.1
             resources: {}
             """
         )
         zoomaker = Zoomaker("zoo.yaml")
         self.assertEqual(zoomaker.data["name"], "test")
-        self.assertEqual(zoomaker.data["version"], "0.0.1")
         self.assertEqual(zoomaker.data["resources"], {})
 
     def test_install_huggingface(self):
         create_zoo(
             """
             name: test
-            version: 0.0.1
             resources:
                 models:
                     - name: analog-diffusion-1.0
@@ -97,7 +94,6 @@ class ZoomakerTestCase(unittest.TestCase):
         create_zoo(
             """
             name: test
-            version: 0.0.1
             resources:
                 models:
                     - name: analog-diffusion-1.0
@@ -125,7 +121,6 @@ class ZoomakerTestCase(unittest.TestCase):
         create_zoo(
             """
             name: test
-            version: 0.0.1
             resources:
                 extensions:
                     - name: stable-diffusion-webui-images-browser
@@ -146,7 +141,6 @@ class ZoomakerTestCase(unittest.TestCase):
         create_zoo(
             """
             name: test
-            version: 0.0.1
             resources:
                 downloads:
                     - name: test-download
@@ -160,6 +154,22 @@ class ZoomakerTestCase(unittest.TestCase):
         zoomaker.install()
         self.assertTrue(os.path.exists("./tmp/test-download.svg"))
 
+    def test_install_download_no_valid_filename_from_src_url_derived(self):
+        create_zoo(
+            """
+            name: test
+            resources:
+                downloads:
+                    - name: test-download
+                      src: https://www.patreon.com/file?h=79649068&i=14281983
+                      type: download
+                      install_to: ./tmp/
+                      rename_to: styles.csv
+            """
+        )
+        zoomaker = Zoomaker("zoo.yaml")
+        zoomaker.install()
+        self.assertTrue(os.path.exists("./tmp/styles.csv"))
 
 if __name__ == "__main__":
     unittest.main()
