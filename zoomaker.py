@@ -6,6 +6,8 @@ from huggingface_hub import hf_hub_download
 import git
 import requests
 from tqdm import tqdm
+import unicodedata
+import re
 
 class Zoomaker:
     def __init__(self, yaml_file: str):
@@ -87,7 +89,8 @@ class Zoomaker:
                             print(f"\tgit pull latest: {repo.head.object.hexsha}")
                 # Download
                 else:
-                    downloaded = self._download_file(src, os.path.join(install_to, os.path.basename(src)))
+                    filename = self._slugify(os.path.basename(src))
+                    downloaded = self._download_file(src, os.path.join(install_to, filename))
                     if rename_to:
                         self._rename_file(downloaded, os.path.join(install_to, rename_to))
                     if revision:
@@ -134,6 +137,24 @@ class Zoomaker:
             print("Error: Failed to download the complete file.")
             return None
         return filename
+
+    def _slugify(self, value, allow_unicode=False):
+        """
+        Makes a filename safe for usage on all filesystems.
+
+        Taken from https://github.com/django/django/blob/master/django/utils/text.py
+        Convert to ASCII if 'allow_unicode' is False. Convert spaces or repeated
+        dashes to single dashes. Remove characters that aren't alphanumerics,
+        underscores, or hyphens. Convert to lowercase. Also strip leading and
+        trailing whitespace, dashes, and underscores.
+        """
+        value = str(value)
+        if allow_unicode:
+            value = unicodedata.normalize('NFKC', value)
+        else:
+            value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
+        value = re.sub(r'[^\w\s-]', '', value.lower())
+        return re.sub(r'[-\s]+', '-', value).strip('-_')
 
 def main():
     parser = argparse.ArgumentParser(description="Install models, git repos and run scripts defined in the zoo.yaml file.")
