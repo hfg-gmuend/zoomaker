@@ -129,8 +129,8 @@ scripts:
 <summary>`zoo.yaml` with web download</summary>
 
 ```yaml
-models:
-  resources:
+resources:
+  models:
     - name: analog-diffusion-v1
       src: https://civitai.com/api/download/models/1344
       type: download
