@@ -8,14 +8,13 @@ Zoomaker is a command-line tool that helps install AI models, git repositories a
 - **single source of truth**: all resources are neatly defined in the `zoo.yaml` file
 - **freeze versions**: know exactly which revision of a resources is installed at any time
 - **only download once**: optimize bandwidth and cache your models locally
-- **optimize disk usage**: downloaded models are symlinked to the installation folder (small files <5MB are duplicate)
+- **optimize disk usage**: downloaded models are cached
 
 ## 😻 TL;DR
 
 1. Install Zoomaker `pip install zoomaker`
 2. Define your resources in the `zoo.yaml` file
 3. Run `zoomaker install` to install them
-(on Windows: `zoomaker install --no-symlinks`, see [hints](https://github.com/hfg-gmuend/zoomaker#%EF%B8%8F-limitations-on-windows) below)
 
 
 ## 📦 Installation
@@ -121,7 +120,7 @@ scripts:
   start_webui: |
     conda activate automatic1111
     cd /home/$(whoami)/stable-diffusion-webui/
-    ./webui.sh --theme dark --xformers --no-half
+    ./webui.sh --xformers --no-half
 ```
 </details>
 
@@ -138,7 +137,7 @@ resources:
       rename_to: analog-diffusion-v1.safetensors
 ```
 Please note:
-The resource `type: download` can be seen as the last resort. Currently there is no caching or symlinking of web downloads. Recommended to avoid it :)
+The resource `type: download` can be seen as the last resort. Existing web downloads are skipped, but no other caching. It is recommended to avoid web downloads :)
 </details>
 
 ## 🧮 zoo.yaml Structure
@@ -171,23 +170,21 @@ All commands are run from the root of the project, where also your `zoo.yaml` fi
 | `zoomaker run <script_name>`    | Run CLI scripts as defined in `zoo.yaml` |
 | `zoomaker --help` | Get help using the Zoomaker CLI                     |
 | `zoomaker --version` | Show current Zoomaker version                     |
-| `zoomaker --no-symlinks` | Do not use symlinks for installing resources  |
 
-## ⚠️ Limitations on Windows
-Symlinks are not widely supported on Windows, which limits the caching mechanism used by Zoomaker. To work around this limitation, you can disable symlinks by using the `--no-symlinks` flag with the install command:
 
-```bash
-zoomaker install --no-symlinks
-```
-
-This will still use the cache directory for checking if files are already cached, but if not, they will be downloaded and duplicated directly to the installation directory, saving bandwidth but increasing disk usage. Alternatively, you can use the [Windows Subsystem for Linux "WSL"](https://docs.microsoft.com/en-us/windows/wsl/install-win10) (don't forget to [enable developer mode](https://docs.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development)) or run Zoomaker as an administrator to enable symlink support on Windows.
-
-## 🤗 Hugging Face Access Token
+## 🤗 Hugging Face Access Token and Custom Cache Location
 
 You might be asked for a [Hugging Face Access Token](https://huggingface.co/docs/hub/security-tokens) during `zoomaker install`. Some resources on Hugging Face require accepting the terms of use of the model. You can set your access token by running this command in a terminal. The command `huggingface-cli` is automatically shipped alongside zoomaker.
 
 ```bash
 huggingface-cli login
+```
+
+You can specify a custom cache location by setting the HF_HOME environment variable. The default cache location is `~/.cache/huggingface/`.
+
+```bash
+export HF_HOME=/path/to/your/cache
+zoomaker install
 ```
 
 ## 🙏 Acknowledgements
