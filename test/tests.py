@@ -84,6 +84,8 @@ class ZoomakerTestCase(unittest.TestCase):
     def test_install_huggingface_cached(self):
         filepath = try_to_load_from_cache(
             repo_id="sd-concepts-library/moebius", filename="learned_embeds.bin")
+        
+        self.assertTrue(isinstance(filepath, str))
         self.assertTrue(os.path.exists(filepath))
         self.assertIsInstance(filepath, str)
         self.assertFalse(filepath == _CACHED_NO_EXIST)
