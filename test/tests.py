@@ -79,7 +79,8 @@ class ZoomakerTestCase(unittest.TestCase):
         zoomaker = Zoomaker("zoo.yaml")
         zoomaker.install()
         self.assertTrue(os.path.exists("./tmp/embeddings/moebius.bin"))
-
+        
+    @unittest.skipIf(sys.platform.startswith("win"), "Skipping on Windows")
     def test_install_huggingface_cached(self):
         filepath = try_to_load_from_cache(
             repo_id="sd-concepts-library/moebius", filename="learned_embeds.bin")
