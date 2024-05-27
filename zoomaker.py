@@ -35,12 +35,10 @@ class Zoomaker:
                 if type not in ["huggingface", "git", "download"]:
                     raise Exception(f"❌ Unknown resource type: {type}")
 
-    def install(self, no_symlinks: bool = False):
+    def install(self):
         print(f"👋 ===> {self.yaml_file} <===")
         print(f"name: {self.data.get('name', 'N/A')}")
         print(f"version: {self.data.get('version', 'N/A')}\n")
-        if no_symlinks:
-            print(f"⛔️ installing resources without symlinks ...")
         print(f"👇 installing resources ...")
         counter = 0;
         for group, resources in self.data["resources"].items():
@@ -61,7 +59,8 @@ class Zoomaker:
                 if type == "huggingface":
                     repo_id = "/".join(src.split("/")[0:2])
                     repo_filepath = "/".join(src.split("/")[2:])
-                    downloaded = hf_hub_download(repo_id=repo_id, filename=repo_filepath, local_dir=install_to, revision=revision, local_dir_use_symlinks=False if no_symlinks else "auto")
+                    downloaded = hf_hub_download(repo_id=repo_id, filename=repo_filepath, local_dir=install_to, revision=revision)
+                    print(f"\t   size: {self._get_file_size(downloaded)}")
                     if rename_to:
                         self._rename_file(downloaded, os.path.join(install_to, rename_to))
                 # Git
@@ -90,11 +89,17 @@ class Zoomaker:
                 # Download
                 else:
                     filename = self._slugify(os.path.basename(src))
-                    downloaded = self._download_file(src, os.path.join(install_to, filename))
-                    if rename_to:
-                        self._rename_file(downloaded, os.path.join(install_to, rename_to))
-                    if revision:
-                        print(f"\trevision is not supported for download. Ignoring revision: {revision}")
+                    destination = os.path.join(install_to, filename)
+                    destinationRenamed = os.path.join(install_to, rename_to)
+                    if os.path.exists(destination) or os.path.exists(destinationRenamed):
+                        print(f"\t   ℹ️ Skipping download: '{filename}' already exists")
+                    else:
+                        downloaded = self._download_file(src, destination)
+                        print(f"\t   size: {self._get_file_size(downloaded)}")
+                        if rename_to:
+                            self._rename_file(downloaded, destinationRenamed)
+                        if revision:
+                            print(f"\trevision is not supported for download. Ignoring revision: {revision}")
 
         print(f"\n✅ {counter} resources installed.")
 
@@ -122,6 +127,17 @@ class Zoomaker:
             os.rename(src, dest)
         else:
             os.rename(src, dest)
+
+    def _get_file_size(self, path):
+        size = os.stat(path).st_size
+        if size < 1024:
+            return f"{size} bytes"
+        elif size < pow(1024, 2):
+            return f"{round(size/1024, 2)} KB"
+        elif size < pow(1024, 3):
+            return f"{round(size/(pow(1024,2)), 2)} MB"
+        elif size < pow(1024, 4):
+            return f"{round(size/(pow(1024,3)), 2)} GB"
 
     def _download_file(self, url, filename):
         response = requests.get(url, stream=True)
@@ -160,12 +176,11 @@ def main():
     parser = argparse.ArgumentParser(description="Install models, git repos and run scripts defined in the zoo.yaml file.")
     parser.add_argument("command", nargs="?", choices=["install", "run"], help="The command to execute.")
     parser.add_argument("script", nargs="?", help="The script name to execute.")
-    parser.add_argument("--no-symlinks", action='store_true', help="Do not create symlinks for the installed resources.")
-    parser.add_argument("-v", "--version", action='version', help="The current version of the zoomaker.", version="0.7.0")
+    parser.add_argument("-v", "--version", action="version", help="The current version of the zoomaker.", version="0.8.0")
     args = parser.parse_args()
 
     if args.command == "install":
-        Zoomaker("zoo.yaml").install(args.no_symlinks)
+        Zoomaker("zoo.yaml").install()
     elif args.command == "run":
         Zoomaker("zoo.yaml").run(args.script)
     else:
