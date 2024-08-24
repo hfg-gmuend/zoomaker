@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "zoomaker"
-version = "0.8.0"
+version = "0.8.1"
 description = "Zoomaker - Friendly house keeping for your AI model zoo and related resources."
 authors = ["Benedikt Groß"]
 readme = "README.md"

@@ -1,3 +1,15 @@
+# Available tests:
+# - test_empty_zoo_yaml
+# - text_missing_zoo_yaml
+# - test_invalid_zoo_yaml
+# - test_valid_zoo_yaml
+# - test_install_civitai
+# - test_install_huggingface
+# - test_install_huggingface_cached
+# - test_install_git
+# - test_install_download
+# - test_install_download_no_valid_filename_from_src_url_derived
+
 import unittest
 import subprocess
 from textwrap import dedent
@@ -24,7 +36,6 @@ def delete_tmp():
     print(dir_path)
     if os.path.exists(dir_path):
         shutil.rmtree(dir_path, ignore_errors=True)
-
 
 class ZoomakerTestCase(unittest.TestCase):
     def setUpClass():
@@ -62,6 +73,26 @@ class ZoomakerTestCase(unittest.TestCase):
         zoomaker = Zoomaker("zoo.yaml")
         self.assertEqual(zoomaker.data["name"], "test")
         self.assertEqual(zoomaker.data["resources"], {})
+    
+    def test_install_civitai(self):
+        create_zoo(
+            """
+            name: test
+            resources:
+                models:
+                    - name: test_model
+                      src: https://civitai.com/api/download/models/369718?type=Model&format=PickleTensor
+                      type: download
+                      #api_key: YOUR_CIVITAI_API_KEY
+                      install_to: ./tmp/models/
+                      rename_to: test_model.safetensors
+            """
+        )
+        zoomaker = Zoomaker("zoo.yaml")
+        zoomaker.install()
+        self.assertTrue(os.path.exists("./tmp/models/test_model.safetensors"))
+
+       
 
     def test_install_huggingface(self):
         create_zoo(
@@ -144,4 +175,17 @@ class ZoomakerTestCase(unittest.TestCase):
         self.assertTrue(os.path.exists("./tmp/styles.csv"))
 
 if __name__ == "__main__":
-    unittest.main()
+    # Create a test suite
+    suite = unittest.TestSuite()
+
+    # If command-line arguments are provided, run only those tests
+    if len(sys.argv) > 1:
+        for test_name in sys.argv[1:]:
+            suite.addTest(ZoomakerTestCase(test_name))
+    else:
+        # If no arguments, run all tests
+        suite = unittest.defaultTestLoader.loadTestsFromTestCase(ZoomakerTestCase)
+
+    # Run the tests
+    runner = unittest.TextTestRunner()
+    runner.run(suite)

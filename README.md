@@ -158,6 +158,7 @@ The resource `type: download` can be seen as the last resort. Existing web downl
 - `rename_to` (optional)
 - `revision` (optional), if none is defined the latest version from the main branch is downloaded
 - `type` can either be `git`, `huggingface` or `download`
+- `api_key` (optional) for civitai
 </details>
 
 ## 🧞 Zoomaker Commands
