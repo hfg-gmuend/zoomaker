@@ -48,6 +48,7 @@ class Zoomaker:
                 name = resource["name"]
                 src = resource["src"]
                 type = resource["type"]
+                api_key = resource.get("api_key", None)
                 revision = resource.get("revision", None)
                 rename_to = resource.get("rename_to", None)
                 install_to = os.path.abspath(resource["install_to"])
@@ -86,6 +87,7 @@ class Zoomaker:
                         else:
                             repo.remotes.origin.pull()
                             print(f"\tgit pull latest: {repo.head.object.hexsha}")
+                    
                 # Download
                 else:
                     filename = self._slugify(os.path.basename(src))
@@ -94,7 +96,7 @@ class Zoomaker:
                     if os.path.exists(destination) or os.path.exists(destinationRenamed):
                         print(f"\t   ℹ️ Skipping download: '{filename}' already exists")
                     else:
-                        downloaded = self._download_file(src, destination)
+                        downloaded = self._download_file(src, install_to, filename, api_key)
                         print(f"\t   size: {self._get_file_size(downloaded)}")
                         if rename_to:
                             self._rename_file(downloaded, destinationRenamed)
@@ -139,20 +141,56 @@ class Zoomaker:
         elif size < pow(1024, 4):
             return f"{round(size/(pow(1024,3)), 2)} GB"
 
-    def _download_file(self, url, filename):
-        response = requests.get(url, stream=True)
-        total_size_in_bytes = int(response.headers.get('content-length', 0))
-        block_size = 1024
-        progress_bar = tqdm(desc="\tdownloading", total=total_size_in_bytes, unit='iB', unit_scale=True, ncols=100)
-        with open(filename, 'wb') as file:
-            for data in response.iter_content(block_size):
-                progress_bar.update(len(data))
-                file.write(data)
-        progress_bar.close()
-        if total_size_in_bytes != 0 and progress_bar.n != total_size_in_bytes:
-            print("Error: Failed to download the complete file.")
+    def _download_file(self, src, install_to, name, bearer_token = None):
+        try:
+            # Send a GET request to the download URL
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            }
+            if bearer_token:
+                headers['Authorization'] = f'Bearer {bearer_token}'
+            response = requests.get(src, stream=True, allow_redirects=True, headers=headers)
+            response.raise_for_status()
+            
+            # Get the filename from the Content-Disposition header
+            content_disposition = response.headers.get('Content-Disposition')
+            if content_disposition:
+                filename = re.findall("filename=(.+)", content_disposition)[0].strip('"')
+            else:
+                filename = name
+            
+            # Sanitize the filename
+            filename = self._slugify(filename)
+            
+            # Construct the full path for the file
+            file_path = os.path.join(install_to, filename)
+            
+            # Download the file with progress bar
+            total_size = int(response.headers.get('content-length', 0))
+            with open(file_path, 'wb') as file, tqdm(
+                desc=filename,
+                total=total_size,
+                unit='iB',
+                unit_scale=True,
+                unit_divisor=1024,
+            ) as progress_bar:
+                for data in response.iter_content(chunk_size=1024):
+                    size = file.write(data)
+                    progress_bar.update(size)
+            
+            print(f"\t   Downloaded: {file_path}")
+            print(f"\t   Size: {self._get_file_size(file_path)}")
+            
+            return file_path
+        except requests.exceptions.RequestException as e:
+            print(f"\t   ❌ Error downloading file: {e}")
             return None
-        return filename
+        except IOError as e:
+            print(f"\t   ❌ Error writing file: {e}")
+            return None
+        except Exception as e:
+            print(f"\t   ❌ Unexpected error: {e}")
+            return None
 
     def _slugify(self, value, allow_unicode=False):
         """
