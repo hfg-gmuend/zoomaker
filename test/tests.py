@@ -164,7 +164,7 @@ class ZoomakerTestCase(unittest.TestCase):
             resources:
                 downloads:
                     - name: test-download
-                      src: https://www.patreon.com/file?h=79649068&i=14281983
+                      src: https://raw.githubusercontent.com/thundercat71/Automatic1111-Fooocus-Styles/main/styles.csv
                       type: download
                       install_to: ./tmp/
                       rename_to: styles.csv
