@@ -87,7 +87,7 @@ class Zoomaker:
                         else:
                             repo.remotes.origin.pull()
                             print(f"\tgit pull latest: {repo.head.object.hexsha}")
-                    
+
                 # Download
                 else:
                     filename = self._slugify(os.path.basename(src))
@@ -151,20 +151,20 @@ class Zoomaker:
                 headers['Authorization'] = f'Bearer {bearer_token}'
             response = requests.get(src, stream=True, allow_redirects=True, headers=headers)
             response.raise_for_status()
-            
+
             # Get the filename from the Content-Disposition header
             content_disposition = response.headers.get('Content-Disposition')
             if content_disposition:
                 filename = re.findall("filename=(.+)", content_disposition)[0].strip('"')
             else:
                 filename = name
-            
+
             # Sanitize the filename
             filename = self._slugify(filename)
-            
+
             # Construct the full path for the file
             file_path = os.path.join(install_to, filename)
-            
+
             # Download the file with progress bar
             total_size = int(response.headers.get('content-length', 0))
             with open(file_path, 'wb') as file, tqdm(
@@ -177,10 +177,10 @@ class Zoomaker:
                 for data in response.iter_content(chunk_size=1024):
                     size = file.write(data)
                     progress_bar.update(size)
-            
+
             print(f"\t   Downloaded: {file_path}")
             print(f"\t   Size: {self._get_file_size(file_path)}")
-            
+
             return file_path
         except requests.exceptions.RequestException as e:
             print(f"\t   ❌ Error downloading file: {e}")
@@ -214,7 +214,7 @@ def main():
     parser = argparse.ArgumentParser(description="Install models, git repos and run scripts defined in the zoo.yaml file.")
     parser.add_argument("command", nargs="?", choices=["install", "run"], help="The command to execute.")
     parser.add_argument("script", nargs="?", help="The script name to execute.")
-    parser.add_argument("-v", "--version", action="version", help="The current version of the zoomaker.", version="0.8.0")
+    parser.add_argument("-v", "--version", action="version", help="The current version of the zoomaker.", version="0.9.0")
     args = parser.parse_args()
 
     if args.command == "install":
