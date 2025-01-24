@@ -60,10 +60,15 @@ class Zoomaker:
                 if type == "huggingface":
                     repo_id = "/".join(src.split("/")[0:2])
                     repo_filepath = "/".join(src.split("/")[2:])
-                    downloaded = hf_hub_download(repo_id=repo_id, filename=repo_filepath, local_dir=install_to, revision=revision)
-                    print(f"\t   size: {self._get_file_size(downloaded)}")
-                    if rename_to:
-                        self._rename_file(downloaded, os.path.join(install_to, rename_to))
+                    destination = os.path.join(install_to, repo_filepath)
+                    destinationRenamed = os.path.join(install_to, rename_to)
+                    if os.path.exists(destination) or os.path.exists(destinationRenamed):
+                        print(f"\t   ℹ️ Skipping download: '{filename}' already exists")
+                    else:
+                        downloaded = hf_hub_download(repo_id=repo_id, filename=repo_filepath, local_dir=install_to, revision=revision)
+                        print(f"\t   size: {self._get_file_size(downloaded)}")
+                        if rename_to:
+                            self._rename_file(downloaded, os.path.join(install_to, rename_to))
                 # Git
                 elif type == "git":
                     repo_path = os.path.join(install_to, self._get_repo_name(src))
