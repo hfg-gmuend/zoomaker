@@ -171,7 +171,8 @@ All commands are run from the root of the project, where also your `zoo.yaml` fi
 | `zoomaker run <script_name>`    | Run CLI scripts as defined in `zoo.yaml` |
 | `zoomaker --help` | Get help using the Zoomaker CLI                     |
 | `zoomaker --version` | Show current Zoomaker version                     |
-
+| `zoomaker install -f <file>` | Installs resources as defined in the specified YAML file |
+| `zoomaker run -f <file> <script_name>` | Run CLI scripts as defined in the specified YAML file |
 
 ## 🤗 Hugging Face Access Token and Custom Cache Location
 

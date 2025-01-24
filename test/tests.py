@@ -174,6 +174,26 @@ class ZoomakerTestCase(unittest.TestCase):
         zoomaker.install()
         self.assertTrue(os.path.exists("./tmp/styles.csv"))
 
+    def test_install_with_custom_yaml_file(self):
+        custom_yaml_file = "custom_zoo.yaml"
+        with open(custom_yaml_file, "w") as f:
+            f.write(dedent(
+                """
+                name: test
+                resources:
+                    models:
+                        - name: test_model
+                          src: https://civitai.com/api/download/models/369718?type=Model&format=PickleTensor
+                          type: download
+                          install_to: ./tmp/models/
+                          rename_to: test_model.safetensors
+                """
+            ))
+        zoomaker = Zoomaker(custom_yaml_file)
+        zoomaker.install()
+        self.assertTrue(os.path.exists("./tmp/models/test_model.safetensors"))
+        os.remove(custom_yaml_file)
+
 if __name__ == "__main__":
     # Create a test suite
     suite = unittest.TestSuite()

@@ -214,13 +214,14 @@ def main():
     parser = argparse.ArgumentParser(description="Install models, git repos and run scripts defined in the zoo.yaml file.")
     parser.add_argument("command", nargs="?", choices=["install", "run"], help="The command to execute.")
     parser.add_argument("script", nargs="?", help="The script name to execute.")
+    parser.add_argument("-f", "--file", default="zoo.yaml", help="The YAML file to use.")
     parser.add_argument("-v", "--version", action="version", help="The current version of the zoomaker.", version="0.9.0")
     args = parser.parse_args()
 
     if args.command == "install":
-        Zoomaker("zoo.yaml").install()
+        Zoomaker(args.file).install()
     elif args.command == "run":
-        Zoomaker("zoo.yaml").run(args.script)
+        Zoomaker(args.file).run(args.script)
     else:
         parser.print_help()
 
