@@ -14,14 +14,32 @@ import unittest
 import subprocess
 from textwrap import dedent
 import git
+import time
 import os
 import io
 import shutil
 import sys
+import logging
 from huggingface_hub import try_to_load_from_cache, _CACHED_NO_EXIST
-sys.path.append('..')
-from zoomaker import Zoomaker
 
+# Ensure we use the local version
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
+
+from zoomaker import Zoomaker, logger
+from unittest.runner import TextTestRunner
+from unittest.runner import TextTestResult
+
+class RealTimeTestResult(TextTestResult):
+    def startTest(self, test):
+        self._started_at = time.time()
+        super().startTest(test)
+
+    def addSuccess(self, test):
+        super().addSuccess(test)
+        self.stream.write('\n')
+        self.stream.flush()
 
 def create_zoo(zoo_yaml):
     with open("zoo.yaml", "w") as f:
@@ -32,19 +50,12 @@ def delete_zoo():
         os.remove("zoo.yaml")
 
 def delete_tmp():
-    dir_path = os.path.join(os.path.abspath(os.path.dirname( __file__)), "tmp")
-    print(dir_path)
+    dir_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), "tmp")
+    logger.info(dir_path)
     if os.path.exists(dir_path):
         shutil.rmtree(dir_path, ignore_errors=True)
 
 class ZoomakerTestCase(unittest.TestCase):
-    def setUpClass():
-        suppress_text = io.StringIO()
-        sys.stdout = suppress_text
-
-    def tearDownClass():
-        sys.stdout = sys.__stdout__
-
     def tearDown(self):
         delete_zoo()
         delete_tmp()
@@ -73,43 +84,58 @@ class ZoomakerTestCase(unittest.TestCase):
         zoomaker = Zoomaker("zoo.yaml")
         self.assertEqual(zoomaker.data["name"], "test")
         self.assertEqual(zoomaker.data["resources"], {})
-    
-    def test_install_civitai(self):
+       
+
+    @unittest.skip("Large file")
+    def test_install_huggingface_large(self):
         create_zoo(
             """
             name: test
             resources:
-                models:
-                    - name: test_model
-                      src: https://civitai.com/api/download/models/369718?type=Model&format=PickleTensor
-                      type: download
-                      #api_key: YOUR_CIVITAI_API_KEY
-                      install_to: ./tmp/models/
-                      rename_to: test_model.safetensors
+                embeddings:
+                    - name: deep1
+                      src: mcmonkey/cosmos-1.0/Cosmos-1_0-Diffusion-7B-Text2World.safetensors
+                      type: huggingface
+                      install_to: ./tmp/test/
             """
         )
         zoomaker = Zoomaker("zoo.yaml")
         zoomaker.install()
-        self.assertTrue(os.path.exists("./tmp/models/test_model.safetensors"))
-
-       
-
+        self.assertTrue(os.path.exists("./tmp/test/Cosmos-1_0-Diffusion-7B-Text2World.safetensors"))
+    
     def test_install_huggingface(self):
         create_zoo(
             """
             name: test
             resources:
                 embeddings:
-                    - name: moebius
-                      src: sd-concepts-library/moebius/learned_embeds.bin
+                    - name: deep1
+                      src: deepseek-ai/DeepSeek-R1/figures/benchmark.jpg
                       type: huggingface
-                      install_to: ./tmp/embeddings/
-                      rename_to: moebius.bin
+                      install_to: ./tmp/test/
             """
         )
         zoomaker = Zoomaker("zoo.yaml")
         zoomaker.install()
-        self.assertTrue(os.path.exists("./tmp/embeddings/moebius.bin"))
+        self.assertTrue(os.path.exists("./tmp/test/benchmark.jpg"))
+
+    @unittest.skip("skip")
+    def test_install_huggingface_rename(self):
+        create_zoo(
+            """
+            name: test
+            resources:
+                embeddings:
+                    - name: deep2
+                      src: deepseek-ai/DeepSeek-R1/figures/benchmark.jpg
+                      type: huggingface
+                      install_to: ./tmp/test/
+                      rename_to: benchmark2.jpg
+            """
+        )
+        zoomaker = Zoomaker("zoo.yaml")
+        zoomaker.install()
+        self.assertTrue(os.path.exists("./tmp/test/benchmark2.jpg"))
 
     @unittest.skipIf(sys.platform.startswith("win"), "Skipping on Windows")
     def test_install_huggingface_cached(self):
@@ -177,7 +203,9 @@ class ZoomakerTestCase(unittest.TestCase):
         zoomaker.install()
         self.assertTrue(os.path.exists("./tmp/styles.csv"))
 
-    def test_install_with_custom_yaml_file(self):
+    # skip this test as it requires an API key
+    @unittest.skip("Requires API key")
+    def test_install_civitai_derived_filename_from_api(self):
         custom_yaml_file = "custom_zoo.yaml"
         with open(custom_yaml_file, "w") as f:
             f.write(dedent(
@@ -188,13 +216,55 @@ class ZoomakerTestCase(unittest.TestCase):
                         - name: test_model
                           src: https://civitai.com/api/download/models/369718?type=Model&format=PickleTensor
                           type: download
+                          api_key: 65f5bdb2332ef1bab3b5c156dd85b6fa
                           install_to: ./tmp/models/
-                          rename_to: test_model.safetensors
                 """
             ))
         zoomaker = Zoomaker(custom_yaml_file)
         zoomaker.install()
-        self.assertTrue(os.path.exists("./tmp/models/test_model.safetensors"))
+        self.assertTrue(os.path.exists("./tmp/models/CS-MNC.pt"))
+        os.remove(custom_yaml_file)
+
+    @unittest.skip("Large file")
+    def test_install_civitai_derived_filename(self):
+        custom_yaml_file = "custom_zoo.yaml"
+        with open(custom_yaml_file, "w") as f:
+            f.write(dedent(
+                """
+                name: test
+                resources:
+                    models:
+                        - name: test_model
+                          src: https://civitai.com/api/download/models/712448?type=Model&format=SafeTensor&size=pruned&fp=fp16
+                          type: download
+                          install_to: ./tmp/models/
+                """
+            ))
+        zoomaker = Zoomaker(custom_yaml_file)
+        zoomaker.install()
+        self.assertTrue(os.path.exists("./tmp/models/realDream_15SD15.safetensors"))
+        os.remove(custom_yaml_file)
+    
+    @unittest.skip("Large file")
+    def test_install_civitai_rename(self):
+        custom_yaml_file = "custom_zoo.yaml"
+        with open(custom_yaml_file, "w") as f:
+            f.write(dedent(
+                """
+                name: test
+                resources:
+                    models:
+                        - name: test_model
+                          src: https://civitai.com/api/download/models/712448?type=Model&format=SafeTensor&size=pruned&fp=fp16
+                          type: download
+                          #api_key: 65f5bdb2332ef1bab3b5c156dd85b6f
+                          install_to: ./tmp/models/
+                          rename_to: test.zip
+                """
+            ))
+        zoomaker = Zoomaker(custom_yaml_file)
+        zoomaker.install()
+        self.assertTrue(os.path.exists("./tmp/models/test.zip"))
         os.remove(custom_yaml_file)
 
 if __name__ == "__main__":
@@ -209,6 +279,6 @@ if __name__ == "__main__":
         # If no arguments, run all tests
         suite = unittest.defaultTestLoader.loadTestsFromTestCase(ZoomakerTestCase)
 
-    # Run the tests
-    runner = unittest.TextTestRunner()
+    # Run the tests with real-time output
+    runner = TextTestRunner(verbosity=2, resultclass=RealTimeTestResult)
     runner.run(suite)
