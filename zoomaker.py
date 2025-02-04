@@ -83,15 +83,17 @@ class Zoomaker:
                     # logger.info(f"\t   repo_filename: {repo_filename}")
                     # logger.info(f"\t   destination: {destination}")
                     # logger.info(f"\t   destinationRenamed: {destinationRenamed}")
-
-                    downloaded = hf_hub_download(repo_id=repo_id, filename=repo_filepath, local_dir=install_to, revision=revision)
-                    logger.info(f"\t   size: {self._get_file_size(downloaded)}")
-                    if rename_to:
-                        self._rename_file(downloaded, destinationRenamed)
-                        logger.info(f"\t   Downloaded and Renamed to: {destinationRenamed}")
+                    if destinationRenamed and os.path.exists(destinationRenamed):
+                        logger.info(f"\t   ℹ️  Skipping download: '{repo_filename}' already exists")
                     else:
-                        self._rename_file(downloaded, destination)
-                        logger.info(f"\t   Downloaded to: {destination}")
+                        downloaded = hf_hub_download(repo_id=repo_id, filename=repo_filepath, local_dir=install_to, revision=revision)
+                        logger.info(f"\t   size: {self._get_file_size(downloaded)}")
+                        if rename_to:
+                            self._rename_file(downloaded, destinationRenamed)
+                            logger.info(f"\t   Downloaded and Renamed to: {destinationRenamed}")
+                        else:
+                            self._rename_file(downloaded, destination)
+                            logger.info(f"\t   Downloaded to: {destination}")
 
                 # Git
                 elif type == "git":

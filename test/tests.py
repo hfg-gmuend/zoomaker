@@ -119,7 +119,7 @@ class ZoomakerTestCase(unittest.TestCase):
         zoomaker.install()
         self.assertTrue(os.path.exists("./tmp/test/benchmark.jpg"))
 
-    @unittest.skip("skip")
+    #@unittest.skip("skip")
     def test_install_huggingface_rename(self):
         create_zoo(
             """
