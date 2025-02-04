@@ -83,7 +83,7 @@ class Zoomaker:
                     # logger.info(f"\t   repo_filename: {repo_filename}")
                     # logger.info(f"\t   destination: {destination}")
                     # logger.info(f"\t   destinationRenamed: {destinationRenamed}")
-                    
+
                     downloaded = hf_hub_download(repo_id=repo_id, filename=repo_filepath, local_dir=install_to, revision=revision)
                     logger.info(f"\t   size: {self._get_file_size(downloaded)}")
                     if rename_to:
@@ -92,7 +92,7 @@ class Zoomaker:
                     else:
                         self._rename_file(downloaded, destination)
                         logger.info(f"\t   Downloaded to: {destination}")
-                        
+
                 # Git
                 elif type == "git":
                     repo_path = os.path.join(install_to, self._get_repo_name(src))
@@ -196,7 +196,7 @@ class Zoomaker:
             if 'text/html' in content_type or 'application/xhtml+xml' in content_type:
                 logger.error(f"\t   ❌ Received HTML response instead of file. If you are downloading from civitai you will need to add api_key: YOUR_CIVITAI_API_KEY to the resource.")
                 return None
-            
+
             # Rest of the method...
             content_disposition = response.headers.get('Content-Disposition')
             logger.info(f"\t   Content-Disposition: {content_disposition}")
@@ -258,7 +258,7 @@ def main():
     parser.add_argument("command", nargs="?", choices=["install", "run"], help="The command to execute.")
     parser.add_argument("script", nargs="?", help="The script name to execute.")
     parser.add_argument("-f", "--file", default="zoo.yaml", help="The YAML file to use.")
-    parser.add_argument("-v", "--version", action="version", help="The current version of the zoomaker.", version="0.9.0")
+    parser.add_argument("-v", "--version", action="version", help="The current version of the zoomaker.", version="0.10.0")
     args = parser.parse_args()
 
     if args.command == "install":
