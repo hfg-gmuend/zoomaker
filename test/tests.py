@@ -7,6 +7,7 @@
 # - test_install_huggingface
 # - test_install_huggingface_cached
 # - test_install_git
+# - test_install_git_with_submodules
 # - test_install_download
 # - test_install_download_no_valid_filename_from_src_url_derived
 
@@ -168,6 +169,43 @@ class ZoomakerTestCase(unittest.TestCase):
         self.assertTrue(os.path.exists(install_to))
         repo = git.Repo(install_to)
         self.assertEqual(repo.head.commit.hexsha, "a42c7a30181636a05815e62426d5eff4d3340529")
+
+    def test_install_git_with_submodules(self):
+        create_zoo(
+            """
+            name: test
+            resources:
+                repositories:
+                    - name: ComfyUI_UltimateSDUpscale
+                      src: https://github.com/ssitu/ComfyUI_UltimateSDUpscale.git
+                      type: git
+                      install_to: ./tmp/comfy_extensions/
+            """
+        )
+        zoomaker = Zoomaker("zoo.yaml")
+        zoomaker.install()
+        
+        # Verify the main repository was cloned
+        install_to = "./tmp/comfy_extensions/ComfyUI_UltimateSDUpscale"
+        self.assertTrue(os.path.exists(install_to))
+        
+        # Check that the submodule was properly initialized
+        # The ComfyUI_UltimateSDUpscale repo has a ComfyUI_ADUpscalers submodule
+        submodule_path = os.path.join(install_to, "repositories/ultimate_sd_upscale")
+        self.assertTrue(os.path.exists(submodule_path), "Submodule directory does not exist")
+        
+        # Verify the submodule has content (not just an empty directory)
+        # Check for a file that should exist in the submodule
+        submodule_file = os.path.join(submodule_path, "README.md")
+        self.assertTrue(os.path.exists(submodule_file), "Submodule README.md not found")
+        
+        # Verify that we can access the repository and its submodules
+        repo = git.Repo(install_to)
+        self.assertTrue(len(repo.submodules) > 0, "No submodules found in the repository")
+        
+        # Verify submodule is properly initialized
+        submodule = repo.submodule("repositories/ultimate_sd_upscale")
+        self.assertTrue(submodule.module_exists(), "Submodule not properly initialized")
 
     def test_install_download(self):
         create_zoo(

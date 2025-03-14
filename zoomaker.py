@@ -108,16 +108,25 @@ class Zoomaker:
                             logger.info(f"\tgit checkout revision: {repo.head.object.hexsha}")
                         else:
                             repo.remotes.origin.pull()
+                            # Update submodules recursively
+                            repo.git.submodule('update', '--init', '--recursive')
                             logger.info(f"\tgit pull: {repo.head.object.hexsha}")
+                            logger.info(f"\tsubmodules updated recursively")
                     # new repo
                     else:
-                        repo = git.Repo.clone_from(src, repo_path, allow_unsafe_protocols=True, allow_unsafe_options=True, recursive=True, "--recursive")
+                        repo = git.Repo.clone_from(src, repo_path, allow_unsafe_protocols=True, allow_unsafe_options=True, recursive=True)
                         if revision:
                             repo.git.checkout(revision)
+                            # Update submodules recursively after checkout
+                            repo.git.submodule('update', '--init', '--recursive')
                             logger.info(f"\tgit checkout revision: {repo.head.object.hexsha}")
+                            logger.info(f"\tsubmodules updated recursively")
                         else:
+                            # Already cloned recursively, but still need to update submodules after pull
                             repo.remotes.origin.pull()
+                            repo.git.submodule('update', '--init', '--recursive')
                             logger.info(f"\tgit pull latest: {repo.head.object.hexsha}")
+                            logger.info(f"\tsubmodules updated recursively")
 
                 # Download
                 else:
