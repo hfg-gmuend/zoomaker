@@ -103,6 +103,7 @@ class Zoomaker:
                     # existing repo
                     if os.path.exists(repo_path):
                         repo = git.Repo(repo_path)
+                        repo.remotes.origin.fetch()
                         if revision:
                             repo.git.checkout(revision)
                             logger.info(f"\tgit checkout revision: {repo.head.object.hexsha}")
@@ -269,7 +270,7 @@ def main():
     parser.add_argument("command", nargs="?", choices=["install", "run"], help="The command to execute.")
     parser.add_argument("script", nargs="?", help="The script name to execute.")
     parser.add_argument("-f", "--file", default="zoo.yaml", help="The YAML file to use.")
-    parser.add_argument("-v", "--version", action="version", help="The current version of the zoomaker.", version="0.10.3")
+    parser.add_argument("-v", "--version", action="version", help="The current version of the zoomaker.", version="0.10.4")
     args = parser.parse_args()
 
     if args.command == "install":
